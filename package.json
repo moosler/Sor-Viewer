@@ -1,0 +1,26 @@
+{
+  "name": "otdr-reader",
+  "version": "1.0.0",
+  "description": "Simple Parser for reading SOR Files",
+  "main": "node.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mooslerTxx/OTDR-Viewer.git"
+  },
+  "keywords": [
+    "OTDR",
+    "SOR"
+  ],
+  "author": "Marco Moosler",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mooslerTxx/OTDR-Viewer/issues"
+  },
+  "homepage": "https://github.com/mooslerTxx/OTDR-Viewer#readme",
+  "dependencies": {
+    "binary-file": "^0.2.1"
+  }
+}
