@@ -7,7 +7,7 @@ You can use this repo as browser version or node version.
 Currently only SOR files from version 2 are supported.
 
 ## Example
-check out [live example](https://marmoo.de/otdr/).
+check out [live example](https://marmoo.de/coding/otdr/).
 
 ### start Browser Version
 open the "index.html" in your Browser.
