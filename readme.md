@@ -28,6 +28,9 @@ node node.js
 ```
 Node now automatically creates a file "result.json". It contains all parameter specifications and measured values.
 
+### bundle with browserify
+browserify node.js -o bundle.js
+
 ### Config
 Some Config parameters can be set.
 In the browser version the variable "config" in "main-browser.js" can be adjusted.

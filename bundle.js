@@ -2044,6 +2044,192 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 }
 
 },{}],5:[function(require,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],6:[function(require,module,exports){
 class BinReader {
     constructor(data, endian = 'LE') {
         this.data = data
@@ -2148,7 +2334,7 @@ class BinReader {
 }
 
 module.exports = BinReader;
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 class Cksum {
     constructor(name) {
         this.name = name;
@@ -2166,7 +2352,7 @@ class Cksum {
 
 
 module.exports = Cksum;
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 class Datapoints {
     constructor(name, reader) {
         this.name = name;
@@ -2205,7 +2391,7 @@ class Datapoints {
 }
 
 module.exports = Datapoints;
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 class Fxdparam {
     constructor(name) {
         this.name = name;
@@ -2439,7 +2625,7 @@ class Fxdparam {
 }
 
 module.exports = Fxdparam;
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 class Genparam {
     constructor(name) {
         this.name = name;
@@ -2533,7 +2719,7 @@ class Genparam {
 }
 
 module.exports = Genparam;
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 class Keyevent {
     constructor(name) {
         this.name = name;
@@ -2759,7 +2945,7 @@ class Event {
 }
 
 module.exports = Keyevent;
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 //For Node Version
 if (typeof module !== "undefined" && module.exports) {
   var BinaryFile = require("binary-file");
@@ -2770,6 +2956,7 @@ const BinReader = require("./binreader");
 const UnitMapping = require("./unitmapping");
 const Proxy = require("./proxy");
 const Points = require("./points");
+const Cksum = require("./cksum");
 
 class Block {
   constructor(name, version, size, pos, order) {
@@ -2788,7 +2975,7 @@ class Parser {
     this.bf = {};
     this.result = {
       params: {},
-      points: {}
+      points: {},
     };
     this.fileInfo = {};
     this.data = data;
@@ -2869,10 +3056,9 @@ class Parser {
           results = await this.convertResult(unit, resultObj, results);
         }
       } catch (error) {
-        throw "Something went wront by reading unit: " +
-          unit.name +
-          ": " +
-          error;
+        throw (
+          "Something went wront by reading unit: " + unit.name + ": " + error
+        );
       }
     }
     return results;
@@ -2944,7 +3130,7 @@ class Parser {
         }
       } else {
         res = {
-          ...resultObj
+          ...resultObj,
         };
       }
     }
@@ -2995,7 +3181,7 @@ class Parser {
   }
   async getValuesFromBlock(obj, parArr, rThis) {
     let newArr = [];
-    parArr.forEach(element => {
+    parArr.forEach((element) => {
       if (element.indexOf(".") !== -1) {
         let parts = element.split(".");
         let res = this.result.params[parts[0]][parts[1]];
@@ -3031,6 +3217,9 @@ class Parser {
   async checkBlockAndSetCursor(name) {
     let info = this.fileInfo.blocks;
     if (!(name in info)) {
+      if (name == "Cksum") {
+        return false;
+      }
       throw "blockName " + name + " not found!";
     }
     if (info[name]["version"] < 2) {
@@ -3131,7 +3320,9 @@ class Parser {
 }
 module.exports = Parser;
 
-},{"./binreader":5,"./points":12,"./proxy":13,"./unitmapping":16,"binary-file":17}],12:[function(require,module,exports){
+},{"./binreader":6,"./cksum":7,"./points":13,"./proxy":14,"./unitmapping":17,"binary-file":19}],13:[function(require,module,exports){
+const Cksum = require("./cksum");
+
 class Points {
   constructor(name, parser, devMode) {
     this.name = name;
@@ -3148,7 +3339,9 @@ class Points {
     if (this.devMode) {
       num = 100;
     }
-
+    if (num >= 30000) {
+      num = 30000;
+    }
     let valArr = [];
     for (let i = 0; i <= num; i++) {
       let param = await this.parser.parseBlock(this.pointMap);
@@ -3162,23 +3355,21 @@ class Points {
       let x = (resolution * i * xScale) / 1000.0;
       valArr.push([x, y]);
     }
-
     let mult = yMax;
-
     let vals = await this.calcOffset(valArr, mult);
 
     let resObj = {
       yMin: yMin,
       yMax: yMax,
-      points: vals
+      points: vals,
     };
     this.yMin = yMin;
     this.yMax = yMax;
     return resObj;
   }
   async calcOffset(arr, mult) {
-    let cvalArr = await arr.map(function(nested) {
-      return nested.map(function(element, index) {
+    let cvalArr = await arr.map(function (nested) {
+      return nested.map(function (element, index) {
         if (index === 1) {
           return parseFloat((mult - element).toFixed(6));
         } else {
@@ -3198,15 +3389,15 @@ class PointsMap {
         name: "point",
         type: "uInt",
         length: 2,
-        pres: 6
-      }
+        pres: 6,
+      },
     ];
   }
 }
 
 module.exports = Points;
 
-},{}],13:[function(require,module,exports){
+},{"./cksum":7}],14:[function(require,module,exports){
 const GenParams = require('./genparams');
 const SupParams = require('./supparams');
 const FxdParams = require('./fxdparams');
@@ -3230,7 +3421,7 @@ class Proxy {
 }
 
 module.exports = Proxy;
-},{"./cksum":6,"./datapts":7,"./fxdparams":8,"./genparams":9,"./keyevents":10,"./supparams":15}],14:[function(require,module,exports){
+},{"./cksum":7,"./datapts":8,"./fxdparams":9,"./genparams":10,"./keyevents":11,"./supparams":16}],15:[function(require,module,exports){
 const Parser = require('./parser');
 var fs = require('fs');
 
@@ -3276,7 +3467,7 @@ if (typeof window != "undefined") {
 }
 //For Node Version
 module.exports = SorReader;
-},{"./parser":11,"fs":1}],15:[function(require,module,exports){
+},{"./parser":12,"fs":1}],16:[function(require,module,exports){
 class Supparam {
     constructor(name) {
         this.name = name;
@@ -3329,7 +3520,7 @@ class Supparam {
 }
 
 module.exports = Supparam;
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 class UnitMapping {
     constructor() {
         this.mapping = {
@@ -3368,14 +3559,53 @@ class UnitMapping {
 }
 
 module.exports = UnitMapping;
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
+(function (process){
+const SorReader = require("./lib/sor.js");
+
+let arg = process.argv;
+let dir = "./";
+let datapath = dir + "data";
+let sample1 = "EXFO_FTB7400_1550_U.SOR";
+let sample2 = "JDSU_MTS6000_1310_G.sor";
+let sample3 = "sample1310_lowDR.sor";
+
+let filename = sample3;
+
+let filepath = datapath + "/" + filename;
+let ext = filename
+  .split(".")
+  .pop()
+  .toLowerCase();
+
+let config = {
+    createJson: true,
+    devMode: true
+}
+
+if (ext !== "sor") {
+  throw 'only Files with file extension ".sor" allowed';
+}
+
+
+let sor = new SorReader(filepath, config);
+
+var result = "";
+const logResult = async function() {
+  result = await sor.parse();
+  console.log(result);
+};
+logResult();
+
+}).call(this,require('_process'))
+},{"./lib/sor.js":15,"_process":5}],19:[function(require,module,exports){
 'use strict';
 
 const BinaryFile = require('./lib/binary-file');
 
 module.exports = BinaryFile;
 
-},{"./lib/binary-file":18}],18:[function(require,module,exports){
+},{"./lib/binary-file":20}],20:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -3386,6 +3616,8 @@ const BINARY_LENGTH = {
   'UInt16': 2,
   'Int32': 4,
   'UInt32': 4,
+  'BigInt64': 8,
+  'BigUInt64': 8,
   'Float': 4,
   'Double': 8
 };
@@ -3398,7 +3630,7 @@ const fsClose = denodeify(require('fs').close);
 const fsWrite = denodeify(require('fs').write);
 
 class BinaryFile {
-  constructor(path, mode, littleEndian) {
+  constructor (path, mode, littleEndian) {
     littleEndian = littleEndian || false;
     this.path = path;
     this.mode = mode;
@@ -3408,7 +3640,7 @@ class BinaryFile {
 
   // Misc
 
-  open() {
+  open () {
     return new Promise((resolve) => {
       fsOpen(this.path, this.mode).then((fd) => {
         this.fd = fd;
@@ -3417,7 +3649,7 @@ class BinaryFile {
     });
   }
 
-  size() {
+  size () {
     return new Promise((resolve) => {
       fsFstat(this.fd).then((stat) => {
         resolve(stat.size);
@@ -3425,16 +3657,16 @@ class BinaryFile {
     });
   }
 
-  seek(position) {
+  seek (position) {
     this.cursor = position;
     return position;
   }
 
-  tell() {
+  tell () {
     return this.cursor;
   }
 
-  close() {
+  close () {
     return new Promise((resolve) => {
       fsClose(this.fd, () => {
         resolve();
@@ -3444,7 +3676,7 @@ class BinaryFile {
 
   // Read
 
-  read(length, position) {
+  read (length, position) {
     return new Promise((resolve) => {
       const buffer = new Buffer(length);
       fsRead(this.fd, buffer, 0, buffer.length, position || this.cursor).then((bytesRead) => {
@@ -3454,7 +3686,7 @@ class BinaryFile {
     });
   }
 
-  _readNumericType(type, position) {
+  _readNumericType (type, position) {
     return new Promise((resolve) => {
       const length = BINARY_LENGTH[type];
       this.read(length, position).then((buffer) => {
@@ -3464,39 +3696,47 @@ class BinaryFile {
     });
   }
 
-  readInt8(position) {
+  readInt8 (position) {
     return this._readNumericType('Int8', position);
   }
 
-  readUInt8(position) {
+  readUInt8 (position) {
     return this._readNumericType('UInt8', position);
   }
 
-  readInt16(position) {
+  readInt16 (position) {
     return this._readNumericType('Int16', position);
   }
 
-  readUInt16(position) {
+  readUInt16 (position) {
     return this._readNumericType('UInt16', position);
   }
 
-  readInt32(position) {
+  readInt32 (position) {
     return this._readNumericType('Int32', position);
   }
 
-  readUInt32(position) {
+  readUInt32 (position) {
     return this._readNumericType('UInt32', position);
   }
 
-  readFloat(position) {
+  readInt64(position) {
+    return this._readNumericType('BigInt64', position);
+  }
+
+  readUInt64(position) {
+    return this._readNumericType('BigUInt64', position);
+  }
+
+  readFloat (position) {
     return this._readNumericType('Float', position);
   }
 
-  readDouble(position) {
+  readDouble (position) {
     return this._readNumericType('Double', position);
   }
 
-  readString(length, position) {
+  readString (length, position) {
     return new Promise((resolve) => {
       this.read(length, position).then((buffer) => {
         const value = buffer.toString();
@@ -3507,7 +3747,7 @@ class BinaryFile {
 
   // Write
 
-  write(buffer, position) {
+  write (buffer, position) {
     return new Promise((resolve) => {
       fsWrite(this.fd, buffer, 0, buffer.length, position || this.cursor).then((bytesWritten) => {
         if (typeof position === 'undefined') this.cursor += bytesWritten;
@@ -3516,46 +3756,54 @@ class BinaryFile {
     });
   }
 
-  _writeNumericType(value, type, position) {
+  _writeNumericType (value, type, position) {
     const length = BINARY_LENGTH[type];
     const buffer = new Buffer(length);
     buffer['write' + type + (length > 1 ? this.endianness : '')](value, 0);
     return this.write(buffer, position);
   }
 
-  writeInt8(value, position) {
+  writeInt8 (value, position) {
     return this._writeNumericType(value, 'Int8', position);
   }
 
-  writeUInt8(value, position) {
+  writeUInt8 (value, position) {
     return this._writeNumericType(value, 'UInt8', position);
   }
 
-  writeInt16(value, position) {
+  writeInt16 (value, position) {
     return this._writeNumericType(value, 'Int16', position);
   }
 
-  writeUInt16(value, position) {
+  writeUInt16 (value, position) {
     return this._writeNumericType(value, 'UInt16', position);
   }
 
-  writeInt32(value, position) {
+  writeInt32 (value, position) {
     return this._writeNumericType(value, 'Int32', position);
   }
 
-  writeUInt32(value, position) {
+  writeUInt32 (value, position) {
     return this._writeNumericType(value, 'UInt32', position);
   }
 
-  writeFloat(value, position) {
+  writeInt64(value, position) {
+    return this._writeNumericType(value, 'BigInt64', position);
+  }
+
+  writeUInt64(value, position) {
+    return this._writeNumericType(value, 'BigUInt64', position);
+  }
+
+  writeFloat (value, position) {
     return this._writeNumericType(value, 'Float', position);
   }
 
-  writeDouble(value, position) {
+  writeDouble (value, position) {
     return this._writeNumericType(value, 'Double', position);
   }
 
-  writeString(value, position) {
+  writeString (value, position) {
     const buffer = new Buffer(value);
     return this.write(buffer, position);
   }
@@ -3564,7 +3812,7 @@ class BinaryFile {
 module.exports = BinaryFile;
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":3,"denodeify":19,"fs":1}],19:[function(require,module,exports){
+},{"buffer":3,"denodeify":21,"fs":1}],21:[function(require,module,exports){
 ;(function(define){define(function(require,exports,module){
 
 	function denodeify(nodeStyleFunction, filter) {
@@ -3615,4 +3863,4 @@ module.exports = BinaryFile;
 c(require,exports,module);}:function(c){var m={exports:{}};c(function(n){
 return w[n];},m.exports,m);w[n]=m.exports;};})('denodeify',this));
 
-},{}]},{},[14]);
+},{}]},{},[18]);
