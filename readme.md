@@ -13,13 +13,15 @@ Currently only SOR files from version 2 are supported.
 check out [live example](https://marmoo.de/coding/otdr/).
 
 ## install
+
 ```bash
-git clone otdr
+git clone https://github.com/moosler/Sor-Viewer.git otdr
 cd otdr
 npm install
 ```
 
 ### start dev mode
+
 ```bash
 npm run dev
 ```
@@ -30,7 +32,6 @@ npm run dev
 npm run build
 npm rund preview
 ```
-
 
 ### Config
 
