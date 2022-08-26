@@ -1,11 +1,14 @@
-class BinReader {
-    constructor(data, endian = 'LE') {
+export class BinReader {
+    data: object|any;
+    endian: string;
+    cursor: number;
+    constructor(data: object, endian = 'LE') {
         this.data = data
         this.endian = endian;
         this.cursor = 0
     }
 
-    async getArrayName(type, length) {
+    async getArrayName(type: string, length: number) {
         let len = length * 8
         let name = ""
         if (type == "uInt") {
@@ -22,7 +25,7 @@ class BinReader {
         return name
     }
 
-    async readString(len) {
+    async readString(len: number) {
         let str = "";
         for (let index = 0; index < len; index++) {
             var byte = await this.readVal(1);
@@ -40,10 +43,11 @@ class BinReader {
         }
         return str;
     }
-    async readVal(length, type = "Int", position = this.cursor) {
+    async readVal(length: number, type = "Int", position = this.cursor) {
         let end = position + length
         let newArrayBuffer = this.data.slice(position, end)
-        let arrName = await this.getArrayName(type, length)
+        let arrName:string = await this.getArrayName(type, length)
+        // @ts-ignore
         let newArray = new window[arrName](newArrayBuffer)
         this.cursor = end;
         return newArray[0]
@@ -52,46 +56,46 @@ class BinReader {
         return await this.readVal(length)
     }
 
-    async readInt8(position) {
+    async readInt8(position: number | undefined) {
         return await this.readVal(1, "Int", position);
     }
 
-    async readUInt8(position) {
+    async readUInt8(position: number | undefined) {
         return await this.readVal(1, "uInt", position);
     }
 
-    async readInt16(position) {
+    async readInt16(position: number | undefined) {
         return await this.readVal(2, "Int", position);
     }
 
-    async readUInt16(position) {
+    async readUInt16(position: number | undefined) {
         return await this.readVal(2, "uInt", position);
     }
 
-    async readInt32(position) {
+    async readInt32(position: number | undefined) {
         return await this.readVal(4, "Int", position);
     }
 
-    async readUInt32(position) {
+    async readUInt32(position: number | undefined) {
         return await this.readVal(4, "uInt", position);
     }
 
-    async readFloat32(position) {
+    async readFloat32(position: number | undefined) {
         return await this.readVal(4, "Float", position);
     }
 
-    async readFloat64(position) {
+    async readFloat64(position: number | undefined) {
         return await this.readVal(8, "Float", position);
     }
 
-    async readBigInt64(position) {
+    async readBigInt64(position: number | undefined) {
         return await this.readVal(8, "BigInt", position);
     }
-    async readBigUint64(position) {
+    async readBigUint64(position: number | undefined) {
         return await this.readVal(8, "BigUint", position);
     }
 
-    async seek(position) {
+    async seek(position: number) {
         this.cursor = position;
         return position;
     }
@@ -100,5 +104,3 @@ class BinReader {
     }
 
 }
-
-module.exports = BinReader;

@@ -1,0 +1,174 @@
+body {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+
+  margin: 0;
+  /* display: flex; */
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+  margin: 2px;
+}
+
+h3 {
+  padding: 0px;
+  margin: 2px;
+}
+
+#footer a,
+#footer {
+  color: #888;
+}
+#footer a:hover {
+  color: #535bf2;
+}
+
+#header {
+  border-radius: 2px;
+  border: 1px solid grey;
+  background-color: #4f81bc;
+  color: whitesmoke;
+  margin-bottom: 5px;
+}
+
+/* The alert message box */
+#flashMessage {
+  padding: 20px;
+  color: white;
+  margin-bottom: 15px;
+  display: none;
+}
+.messageAlert {
+  background-color: #f44336; /* Red */
+}
+.messageInfo {
+  background-color: #46a7f5; /* Blue */
+}
+.messageWarning {
+  background-color: #ffa92a; /* orange */
+}
+.messageSuccess {
+  background-color: #2eb885; /* green */
+}
+
+/* The close button */
+.closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* When moving the mouse over the close button */
+.closebtn:hover {
+  color: black;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 75% auto;
+  grid-template-rows: 10% 420px auto;
+  grid-template-areas: "File-Select File-Select" "Chart Props" "Events Props";
+  grid-column-gap: 2px;
+  grid-row-gap: 2px;
+}
+
+.File-Select,
+.Chart,
+.Props,
+.Events {
+  border: 1px solid grey;
+  border-radius: 2px;
+  margin: 1px;
+  padding: 2px;
+}
+
+.File-Select {
+  grid-area: File-Select;
+  /* background-color: #f2f2f2; */
+}
+
+.Chart {
+  grid-area: Chart;
+}
+
+.Props {
+  grid-area: Props;
+  /* background-color: #f2f2f2; */
+}
+
+.Events {
+  grid-area: Events;
+  /* background-color: #F2F2F2; */
+}
+
+.Events table {
+  border: 2px solid #505050;
+  border-collapse: collapse;
+  padding: 5px;
+  font-size: 0.9em;
+}
+
+.Events th {
+  border: 1px solid #c0c0c0;
+  padding: 5px;
+  color: #fff;
+  background: #4f81bc;
+}
+
+.Events td {
+  border: 1px solid #dcdcdc;
+  padding: 3px;
+}
+
+.Events tbody tr {
+  background-color: #454141;
+}
+
+.Events tbody tr.selected,
+.Events tbody tr.selected:nth-child(2n + 1) {
+  border: 2px solid grey;
+  background-color: #ffaf82;
+}
+
+.Events tbody tr:nth-child(odd) {
+  background-color: #787272;
+}
+
+.Events tr:hover {
+  background-color: #d8d8d8;
+}
+
+.Events tbody tr:nth-child(odd):hover {
+  background-color: #d8d8d8;
+}

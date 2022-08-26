@@ -1,5 +1,9 @@
-class Supparam {
-    constructor(name) {
+export class Supparam {
+    name: string | any[];
+    prefix: number;
+    params: {};
+    units: { name: string; type: string; length: number; term: boolean; }[];
+    constructor(name: string | any[]) {
         this.name = name;
         this.prefix = name.length + 1; // including \0
         this.params = {};
@@ -48,5 +52,3 @@ class Supparam {
         ];
     }
 }
-
-module.exports = Supparam;

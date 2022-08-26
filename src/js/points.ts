@@ -1,15 +1,21 @@
-const Cksum = require("./cksum");
 
-class Points {
-  constructor(name, parser, devMode) {
+export class Points {
+  name: string;
+  parser: any;
+  devMode: boolean;
+  pointMap: PointsMap;
+  yMin?: number;
+  yMax?: number;
+
+  constructor(name:string, parser:any, devMode:boolean) {
     this.name = name;
     this.parser = parser;
     this.devMode = devMode;
     this.pointMap = new PointsMap();
-    this.yMin = null;
-    this.yMax = null;
+    this.yMin = undefined;
+    this.yMax = undefined;
   }
-  async loopPoints(num, scale, resolution = 1) {
+  async loopPoints(num:number, scale:number, resolution:number = 1) {
     let yMin = Infinity;
     let yMax = -Infinity;
     let xScale = 1;
@@ -19,7 +25,7 @@ class Points {
     if (num >= 30000) {
       num = 30000;
     }
-    let valArr = [];
+    let valArr:any = [];
     for (let i = 0; i <= num; i++) {
       let param = await this.parser.parseBlock(this.pointMap);
       let y = param.point * scale * 0.001;
@@ -44,9 +50,10 @@ class Points {
     this.yMax = yMax;
     return resObj;
   }
-  async calcOffset(arr, mult) {
-    let cvalArr = await arr.map(function (nested) {
-      return nested.map(function (element, index) {
+  async calcOffset(arr:[], mult:number) {
+    let cvalArr = await arr.map(
+      function (nested:any) {
+      return nested.map(function (element:any, index:any) {
         if (index === 1) {
           return parseFloat((mult - element).toFixed(6));
         } else {
@@ -59,6 +66,8 @@ class Points {
 }
 
 class PointsMap {
+  params:object;
+  units: object[];
   constructor() {
     this.params = {};
     this.units = [
@@ -71,5 +80,3 @@ class PointsMap {
     ];
   }
 }
-
-module.exports = Points;

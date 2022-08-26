@@ -1,5 +1,8 @@
-class Fxdparam {
-    constructor(name) {
+export class Fxdparam {
+    name:string;
+    sol:number;
+    units:object[];
+    constructor(name:string) {
         this.name = name;
         this.sol = 299792.458 / 1.0e6; //Speed of Light in km/usec
         this.units = [{
@@ -209,9 +212,9 @@ class Fxdparam {
      * return obj should contain an Result parameter
      * all other parameter will be set in obj
      */
-    async tDx(arr) {
-        let index = arr[0];
-        let sapce = arr[1];
+    async tDx(arr:number[]) {
+        let index:any = arr[0];
+        let sapce:any = arr[1];
         let dataPt = arr[2];
         let ior = parseFloat(index); //index of refraction
         let sasp = sapce;
@@ -229,5 +232,3 @@ class Fxdparam {
         return obj;
     }
 }
-
-module.exports = Fxdparam;

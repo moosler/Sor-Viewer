@@ -1,5 +1,9 @@
-class Genparam {
-    constructor(name) {
+export class Genparam {
+    name: string | any[];
+    prefix: number;
+    params: {};
+    units: ({ name: string; type: string; length: number; term: boolean; read?: undefined; unit?: undefined; append?: undefined; version?: undefined; } | { name: string; type: string; read: string; length: number; term: boolean; unit?: undefined; append?: undefined; version?: undefined; } | { name: string; type: string; length: number; unit: string; term: boolean; read?: undefined; append?: undefined; version?: undefined; } | { name: string; type: string; read: string; length: number; append: boolean; term: boolean; unit?: undefined; version?: undefined; } | { name: string; type: string; length: number; term: boolean; version: number; read?: undefined; unit?: undefined; append?: undefined; })[];
+    constructor(name: string | any[]) {
         this.name = name;
         this.prefix = name.length + 1; // including \0
         this.params = {};
@@ -89,5 +93,3 @@ class Genparam {
         ];
     }
 }
-
-module.exports = Genparam;

@@ -1,4 +1,5 @@
-class UnitMapping {
+export class UnitMapping {
+    mapping: any;
     constructor() {
         this.mapping = {
             "mt": "meters",
@@ -22,7 +23,7 @@ class UnitMapping {
         }
     }
 
-    async getMapping(key, append = false) {
+    async getMapping(key: any, append: boolean = false ) {
         let result = "";
         if (key in this.mapping) {
             let prefix = "";
@@ -34,5 +35,3 @@ class UnitMapping {
         return result;
     }
 }
-
-module.exports = UnitMapping;

@@ -1,5 +1,9 @@
-class Cksum {
-    constructor(name) {
+export class Cksum {
+    name: string;
+    prefix:number;
+    params:object;
+    units: object[];
+    constructor(name:string) {
         this.name = name;
         this.prefix = name.length + 1; // including \0
         this.params = {};
@@ -12,6 +16,3 @@ class Cksum {
         }, ];
     }
 }
-
-
-module.exports = Cksum;

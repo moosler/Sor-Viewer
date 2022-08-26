@@ -1,26 +1,15 @@
 {
-  "name": "otdr-reader",
-  "version": "1.0.0",
-  "description": "Simple Parser for reading SOR Files",
-  "main": "node.js",
+  "name": "vite-ts",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mooslerTxx/OTDR-Viewer.git"
-  },
-  "keywords": [
-    "OTDR",
-    "SOR"
-  ],
-  "author": "Marco Moosler",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/mooslerTxx/OTDR-Viewer/issues"
-  },
-  "homepage": "https://github.com/mooslerTxx/OTDR-Viewer#readme",
-  "dependencies": {
-    "binary-file": "^0.2.1"
+  "devDependencies": {
+    "typescript": "^4.6.4",
+    "vite": "^3.0.7"
   }
 }

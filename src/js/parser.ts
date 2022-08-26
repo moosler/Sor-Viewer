@@ -1,17 +1,22 @@
-//For Node Version
-if (typeof module !== "undefined" && module.exports) {
-  var BinaryFile = require("binary-file");
-}
-
-const BinReader = require("./binreader");
-
-const UnitMapping = require("./unitmapping");
-const Proxy = require("./proxy");
-const Points = require("./points");
-const Cksum = require("./cksum");
+import { BinReader } from "./binreader";
+import { UnitMapping } from "./unitmapping";
+import { Proxy } from "./proxy";
+import { Points } from "./points";
 
 class Block {
-  constructor(name, version, size, pos, order) {
+  name: string;
+  version: string;
+  size: number;
+  pos: number;
+  order: number;
+
+  constructor(
+    name: string,
+    version: string,
+    size: number,
+    pos: number,
+    order: number
+  ) {
     this.name = name;
     this.version = version;
     this.size = size;
@@ -20,8 +25,15 @@ class Block {
   }
 }
 
-class Parser {
-  constructor(path, config, data = {}) {
+export class Parser {
+  path?: string;
+  config: any;
+  bf: any;
+  result: any;
+  fileInfo: any;
+  data: object;
+  unitMapping: any;
+  constructor(config: any, path?: string, data = {}) {
     this.config = config;
     this.path = path;
     this.bf = {};
@@ -37,10 +49,11 @@ class Parser {
     try {
       if (this.config.browserMode) {
         this.bf = new BinReader(this.data);
-      } else {
-        this.bf = new BinaryFile(this.path, "r", true);
-        await this.bf.open();
       }
+      // else {
+      //   this.bf = new BinaryFile(this.path, "r", true);
+      //   await this.bf.open();
+      // }
       if (this.config.debug) console.log("File opened");
       await this.setVersion();
       await this.setMap();
@@ -64,7 +77,7 @@ class Parser {
     }
   }
 
-  async parsePoints(name) {
+  async parsePoints(name: string) {
     let pointsClass = new Points(name, this, this.config.devMode);
     let pointNumber = this.result.params["DataPts"]["number of Points"];
     let scale = this.result.params["DataPts"]["scaling"];
@@ -73,15 +86,15 @@ class Parser {
     this.result.points = result;
   }
 
-  async parseParams(name) {
+  async parseParams(name: string | any) {
     await this.checkBlockAndSetCursor(name);
     let block = new Proxy(name);
     let result = await this.parseBlock(block);
     this.result.params[name] = result;
   }
 
-  async parseBlock(obj) {
-    let results = {};
+  async parseBlock(obj: any) {
+    let results: any = {};
     for (const unit of obj.units) {
       try {
         let result = "";
@@ -116,7 +129,7 @@ class Parser {
     return results;
   }
 
-  async convertResult(unit, newRes, results) {
+  async convertResult(unit: any, newRes: any, results: any) {
     if (unit["result"] == "append") {
       results = await this.setBlockInfo(unit, newRes, results);
     } else if (unit["result"] == "numCalls") {
@@ -129,7 +142,7 @@ class Parser {
     return results;
   }
 
-  async parseResult(result, unit, obj) {
+  async parseResult(result: any, unit: any, obj: any) {
     if (unit.hasOwnProperty("scale")) {
       result *= unit.scale;
     }
@@ -144,16 +157,16 @@ class Parser {
     return result;
   }
 
-  async addUnit(result, unit) {
+  async addUnit(result: any, unit: any) {
     if (unit.hasOwnProperty("unit")) {
       result = result + " " + unit.unit;
     }
     return result;
   }
 
-  async callFunction(unit, ref, results, rThis) {
+  async callFunction(unit: any, ref: any, results: any, rThis: any) {
     await this.functionChecks(unit);
-    let res = {};
+    let res: any = {};
     for (let index = 0; index < unit.func.length; index++) {
       const element = unit.func[index];
       let params = await this.getValuesFromBlock(
@@ -189,7 +202,7 @@ class Parser {
     return res;
   }
 
-  async functionChecks(unit) {
+  async functionChecks(unit: any) {
     if (!unit.hasOwnProperty("params")) {
       throw "No Params defined for Block: " + unit.name;
     }
@@ -201,7 +214,7 @@ class Parser {
     }
   }
 
-  async loopBlock(num, block) {
+  async loopBlock(num: any, block: any) {
     let values = [];
     for (let i = 0; i < num; i++) {
       let param = await this.parseBlock(block);
@@ -214,7 +227,7 @@ class Parser {
     return values;
   }
 
-  async setBlockInfo(unit, newRes, results) {
+  async setBlockInfo(unit: any, newRes: any, results: any) {
     let name = unit.name;
     for (const key in newRes) {
       if (newRes.hasOwnProperty(key)) {
@@ -231,8 +244,8 @@ class Parser {
     }
     return results;
   }
-  async getValuesFromBlock(obj, parArr, rThis) {
-    let newArr = [];
+  async getValuesFromBlock(obj: any, parArr: any[], rThis: any) {
+    let newArr: any[] = [];
     parArr.forEach((element) => {
       if (element.indexOf(".") !== -1) {
         let parts = element.split(".");
@@ -250,8 +263,8 @@ class Parser {
     return newArr;
   }
 
-  async parseCommand(unit, typename = "type") {
-    let result = "";
+  async parseCommand(unit: any, typename: any = "type") {
+    let result: any = "";
     if (unit[typename] === "String") {
       if (unit.length) {
         result = await this.bf.readString(unit.length);
@@ -266,11 +279,11 @@ class Parser {
     return result;
   }
 
-  async checkBlockAndSetCursor(name) {
-    let info = this.fileInfo.blocks;
+  async checkBlockAndSetCursor(name: any) {
+    let info: any = this.fileInfo.blocks;
     if (!(name in info)) {
       if (name == "Cksum") {
-        return false;
+        return;
       }
       throw "blockName " + name + " not found!";
     }
@@ -351,13 +364,13 @@ class Parser {
     return await this.toFixedPoint();
   }
   async getMap() {
-    var map = {};
+    var map: any = {};
     map.bytes = await this.getUInt(4);
     map.nBlocks = (await this.getUInt(2)) - 1;
     return map;
   }
-  async getBlocks(map) {
-    var blocks = {};
+  async getBlocks(map: any) {
+    var blocks: any = {};
     var pos = map.bytes;
     for (var i = 0; i < map.nBlocks; i++) {
       let name = await this.getString();
@@ -370,4 +383,3 @@ class Parser {
     return blocks;
   }
 }
-module.exports = Parser;

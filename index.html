@@ -2,22 +2,33 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link rel="stylesheet" type="text/css" href="style.css" />
-    <title>Document</title>
+    <meta
+      name="description"
+      content="This is an simple Online Viewer for SOR
+    Files (Standard OTDR Record- Telcordia SR-4731, issue 2 standard). This
+    data Format ist used to store OTDR fiber data. "
+    />
+    <meta name="keywords" content="SOR, OTDR, SR-4731, viewer" />
+    <meta name="author" content="Marco Moosler" />
+    <title>SOR Viewer</title>
   </head>
-
   <body>
-    <script src="./bundle.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.6.0/echarts-en.common.min.js"></script>
-    <script src="./main-browser.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.6.0/echarts-en.common.min.js"></script> -->
+
     <div id="header"><h1>Online SOR-Viewer</h1></div>
+    <div id="flashMessage">
+      <div id="message"></div>
+      <span class="closebtn" onclick="this.parentElement.style.display='none';"
+        >&times;</span
+      >
+    </div>
     <div class="grid-container">
-      <div class="File-Select">
+      <div class="File-Select" id="File-Input">
         <form action="#" onsubmit="return false;">
           <input type="file" id="fileinput" accept=".sor,.SOR" />
-          <input type="button" id="btnLoad" value="Load" onclick="loadFile()" />
+          <input type="button" id="btnLoad" value="Load" />
         </form>
       </div>
       <div class="Chart" id="chartContainer" style="height: 400px">
@@ -28,6 +39,11 @@
       </div>
       <div class="Events" id="event-sum"></div>
     </div>
-    <div id="footer">Copyright © Marco Moosler 2020</div>
+    <div id="footer">
+      <a href="mailto:moosler@gmx.de"> Marco Moosler </a>2022
+    </div>
+
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

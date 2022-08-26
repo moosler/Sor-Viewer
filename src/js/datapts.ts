@@ -1,9 +1,14 @@
-class Datapoints {
-    constructor(name, reader) {
+export class Datapoints {
+    name: string;
+    reader: any;
+    yMin?:number;
+    yMax?:number;
+    units: object[];
+    constructor(name:string, reader:any) {
         this.name = name;
         this.reader = reader;
-        this.yMin = null;
-        this.yMax = null;
+        this.yMin = undefined;
+        this.yMax = undefined;
 
         this.units = [{
                 /**@todo error check if points numbers are same */
@@ -34,5 +39,3 @@ class Datapoints {
         ];
     }
 }
-
-module.exports = Datapoints;
