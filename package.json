@@ -11,5 +11,19 @@
   "devDependencies": {
     "typescript": "^4.6.4",
     "vite": "^3.0.7"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moosler/Sor-Viewer.git"
+  },
+  "keywords": [
+    "OTDR",
+    "SOR"
+  ],
+  "author": "Marco Moosler",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/moosler/Sor-Viewer/issues"
+  },
+  "homepage": "https://github.com/moosler/Sor-Viewer#readme"
 }
