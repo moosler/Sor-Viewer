@@ -1,3 +1,5 @@
+# DEPRECATED
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
 # OTDR-Viewer
 
 This is an simple Online Viewer for SOR Files ("Standard OTDR Record"- Telcordia SR-4731, issue 2 standard). This data Format ist used to store OTDR fiber data.
